@@ -1,0 +1,66 @@
+lock throttle to 1.
+set KSC to ship:geoposition.
+AG8 on.
+PRINT "Counting down:".
+FROM {local countdown is 10.} UNTIL countdown = 0 STEP {SET countdown to countdown - 1.} DO {
+    PRINT "..." + countdown.
+    WAIT 1. // pauses the script here for 1 second.
+}
+stage.
+wait 0.7.
+stage.
+Print "Lift off!".
+set startEngines to ship:partstagged("Start").
+when altitude > 9999 then {
+  print "Passing 10Km!".
+}
+when altitude > 13000 then {
+  print "Approaching Max Q.".
+}
+
+//until ship:maxthrust > 0 { stage. }
+
+lock targetPitch to 88.963 - 1.03287 * alt:radar^0.409511.
+set targetDirection to 90.
+lock steering to heading(targetDirection, targetPitch).
+until apoapsis > 60000
+clearscreen.
+print "Main engines cutoff".
+print "Separation in 5 seconds".
+
+lock throttle to 0.
+set i to 0.
+rcs on.
+lock steering to ship:prograde.
+wait 5.
+ag1 on.
+brakes on.
+wait 0.07.
+stage.
+print "Separation confirmed".
+lock steering to srfprograde + R(0,20,0).
+wait 2.
+set lockHDG to KSC:heading.
+lock steering to heading(lockHDG,16).
+wait 1.
+
+until i+1 > startEngines:length {
+	startEngines[i]:shutdown.
+	set i to i+1.
+}
+set i to 0.
+lock throttle to 1.
+print "Starting back burn".
+wait 1.
+brakes off.
+wait 42.5.
+lock throttle to 0.
+clearscreen.
+print "Ballistic trajectory is ok, engines cutoff".
+wait 1.
+lock steering to -srfprograde.
+wait 8.
+brakes on.
+wait 1.
+unlock steering.
+run falcon.
